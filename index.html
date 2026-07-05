@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PissSaver — Australia's Bottle Shop Price Matcher</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1B1D1A;
+  --paper:#FAF8F3;
+  --ticket:#FFD23F;
+  --bottle:#1F5C3D;
+  --slash:#D8321F;
+  --grey:#6E6B63;
+  --line:#E4E0D6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);line-height:1.5}
+.display{font-family:'Anton',sans-serif;letter-spacing:.5px;text-transform:uppercase}
+
+/* HEADER */
+header{background:var(--ink);color:var(--paper);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px}
+.logo .tag{background:var(--ticket);color:var(--ink);padding:2px 10px;font-size:26px;transform:rotate(-2deg);box-shadow:2px 2px 0 var(--slash)}
+.logo small{font-size:11px;color:#B9B5AA;max-width:180px;line-height:1.3}
+nav{display:flex;gap:8px}
+nav button{background:none;border:1px solid #444;color:var(--paper);padding:8px 16px;font-family:'Inter';font-weight:600;font-size:13px;cursor:pointer;border-radius:2px}
+nav button.active{background:var(--ticket);color:var(--ink);border-color:var(--ticket)}
+
+/* HERO */
+.hero{background:var(--bottle);color:var(--paper);padding:44px 24px 36px;text-align:center}
+.hero h1{font-size:clamp(30px,5vw,54px);line-height:1.05}
+.hero h1 span{background:var(--ticket);color:var(--ink);padding:0 12px;display:inline-block;transform:rotate(-1.5deg)}
+.hero p{margin-top:12px;color:#CFE3D6;font-size:15px;max-width:560px;margin-left:auto;margin-right:auto}
+.searchbar{margin:26px auto 0;max-width:640px;display:flex;background:var(--paper);border-radius:3px;overflow:hidden;box-shadow:4px 4px 0 rgba(0,0,0,.25)}
+.searchbar input{flex:1;border:none;padding:15px 18px;font-size:15px;font-family:'Inter';outline:none;background:transparent;color:var(--ink)}
+.searchbar button{background:var(--ticket);border:none;padding:0 24px;font-family:'Anton';font-size:16px;text-transform:uppercase;cursor:pointer;letter-spacing:.5px}
+
+/* FILTERS */
+.filters{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:20px 24px 6px}
+.chip{border:1.5px solid var(--ink);background:transparent;padding:7px 16px;border-radius:999px;font-weight:600;font-size:13px;cursor:pointer;font-family:'Inter'}
+.chip.active{background:var(--ink);color:var(--ticket)}
+.sortrow{display:flex;justify-content:space-between;align-items:center;max-width:1060px;margin:8px auto 0;padding:0 24px;font-size:13px;color:var(--grey);flex-wrap:wrap;gap:8px}
+.sortrow select{padding:6px 10px;border:1px solid var(--line);background:#fff;font-family:'Inter';font-size:13px;border-radius:2px}
+
+/* GRID */
+.grid{max-width:1060px;margin:18px auto 60px;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden;display:flex;flex-direction:column;transition:transform .12s ease, box-shadow .12s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.card-top{padding:16px 16px 10px;border-bottom:1px dashed var(--line);display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.card-top h3{font-size:15px;font-weight:700;line-height:1.3}
+.card-top .cat{font-size:11px;color:var(--grey);text-transform:uppercase;letter-spacing:.8px;margin-top:3px}
+.bestprice{background:var(--ticket);font-family:'Anton';font-size:20px;padding:4px 10px;transform:rotate(2deg);white-space:nowrap;box-shadow:2px 2px 0 var(--slash);line-height:1.2;text-align:center}
+.bestprice small{display:block;font-family:'Inter';font-weight:700;font-size:9px;letter-spacing:.6px}
+.pricelist{padding:10px 16px 14px;font-size:13px}
+.pricerow{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #F1EEE6}
+.pricerow:last-child{border-bottom:none}
+.pricerow .store{font-weight:500}
+.storelink{color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.storelink:hover{text-decoration-color:var(--slash)}
+.pricerow .price{font-weight:700;font-variant-numeric:tabular-nums}
+.pricerow.cheapest .store::after{content:"CHEAPEST";background:var(--slash);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:2px;margin-left:8px;letter-spacing:.5px}
+.pricerow.community .store::after{content:"COMMUNITY";background:var(--bottle);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:2px;margin-left:8px;letter-spacing:.5px}
+.savings{padding:0 16px 14px;font-size:12px;color:var(--bottle);font-weight:600}
+.addbtn{margin:0 16px 16px;padding:9px;border:1.5px dashed var(--grey);background:none;color:var(--grey);font-family:'Inter';font-weight:600;font-size:12px;cursor:pointer;border-radius:3px}
+.addbtn:hover{border-color:var(--ink);color:var(--ink)}
+.empty{grid-column:1/-1;text-align:center;color:var(--grey);padding:60px 0}
+.empty .display{font-size:24px;color:var(--ink)}
+
+/* SUBMIT PAGE */
+.submit-wrap{max-width:560px;margin:40px auto 70px;padding:0 24px}
+.submit-wrap h2{font-size:30px;margin-bottom:6px}
+.submit-wrap>p{color:var(--grey);font-size:14px;margin-bottom:24px}
+form.pricematch{background:#fff;border:1px solid var(--line);border-radius:4px;padding:24px;display:flex;flex-direction:column;gap:16px}
+label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:5px}
+input[type=text],input[type=number],select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:3px;font-family:'Inter';font-size:14px;background:var(--paper)}
+input:focus,select:focus{outline:2px solid var(--ticket);border-color:var(--ink)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.submitbtn{background:var(--ink);color:var(--ticket);border:none;padding:14px;font-family:'Anton';font-size:17px;text-transform:uppercase;letter-spacing:1px;cursor:pointer;border-radius:3px}
+.submitbtn:hover{background:var(--bottle)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) rotate(-1deg);background:var(--ticket);color:var(--ink);font-family:'Anton';padding:12px 26px;font-size:16px;box-shadow:3px 3px 0 var(--slash);display:none;z-index:99}
+.disclaimer{max-width:1060px;margin:0 auto 40px;padding:0 24px;font-size:11px;color:var(--grey)}
+footer{background:var(--ink);color:#8D8A81;text-align:center;padding:26px;font-size:12px}
+footer b{color:var(--ticket);font-family:'Anton';font-weight:400;letter-spacing:.5px}
+.hidden{display:none}
+@media(max-width:600px){.row2{grid-template-columns:1fr}.hero h1{font-size:30px}}
+@media (prefers-reduced-motion: reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="tag display">PissSaver</div>
+    <small>Compare bottle shop prices across Australia</small>
+  </div>
+  <nav>
+    <button id="navBrowse" class="active" onclick="showPage('browse')">Browse Prices</button>
+    <button id="navSubmit" onclick="showPage('submit')">Add a Price</button>
+  </nav>
+</header>
+
+<!-- ============ BROWSE PAGE ============ -->
+<div id="pageBrowse">
+  <section class="hero">
+    <h1 class="display">Never pay full price<br>for a <span>slab</span> again</h1>
+    <p>We compare prices across Dan Murphy's, BWS, Liquorland, First Choice, Thirsty Camel, Cellarbrations and more. Every product listed is stocked in 4+ physical stores nationwide.</p>
+    <div class="searchbar">
+      <input id="search" type="text" placeholder="Search beer, wine, spirits… e.g. Great Northern" oninput="render()">
+      <button class="display" onclick="render()">Search</button>
+    </div>
+  </section>
+
+  <div class="filters" id="filters"></div>
+  <div class="sortrow">
+    <span id="count"></span>
+    <span>Sort:
+      <select id="sort" onchange="render()">
+        <option value="name">Name A–Z</option>
+        <option value="price">Cheapest price</option>
+        <option value="savings">Biggest saving</option>
+      </select>
+    </span>
+  </div>
+
+  <main class="grid" id="grid"></main>
+
+  <p class="disclaimer">Prices shown are indicative and refresh periodically; they may vary by state and store. Community-submitted prices are unverified. PissSaver supports the responsible service of alcohol. You must be 18+ to purchase alcohol in Australia. Don't drink and drive.</p>
+</div>
+
+<!-- ============ SUBMIT PAGE ============ -->
+<div id="pageSubmit" class="hidden">
+  <div class="submit-wrap">
+    <h2 class="display">Spotted a better price?</h2>
+    <p>Bought from a local independent bottle-o that isn't online? Add the store and price here so other drinkers can find it. Community prices appear with a green tag.</p>
+    <form class="pricematch" onsubmit="return submitPrice(event)">
+      <div>
+        <label for="fProduct">Product</label>
+        <select id="fProduct" required></select>
+      </div>
+      <div class="row2">
+        <div>
+          <label for="fStore">Store name</label>
+          <input type="text" id="fStore" placeholder="e.g. Tony's Cellars" required>
+        </div>
+        <div>
+          <label for="fSuburb">Suburb / State</label>
+          <input type="text" id="fSuburb" placeholder="e.g. Clayton VIC" required>
+        </div>
+      </div>
+      <div class="row2">
+        <div>
+          <label for="fPrice">Price paid (AUD)</label>
+          <input type="number" id="fPrice" step="0.01" min="1" placeholder="e.g. 49.99" required>
+        </div>
+        <div>
+          <label for="fDate">Date purchased</label>
+          <input type="text" id="fDate" placeholder="e.g. 4 July 2026" required>
+        </div>
+      </div>
+      <button class="submitbtn" type="submit">Add this price</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast">Price added. Cheers!</div>
+
+<footer><b>PissSaver</b> · Independent price comparison · Not affiliated with any retailer · Drink responsibly</footer>
+
+<script>
+/* ============================================================
+   PRODUCT DATABASE (sample data — replace with live feed/API)
+   Every product below is stocked by 4+ physical-store retailers.
+   Community submissions are held in memory; wire up a backend or
+   localStorage when deploying to persist them.
+   ============================================================ */
+const products = [{"id":1,"name":"Great Northern Super Crisp Cans 30 Block (375mL)","cat":"Beer","prices":[{"store":"Liquorland","price":58.99},{"store":"Dan Murphy's","price":53.95},{"store":"First Choice Liquor","price":53.0},{"store":"Bottlemart","price":54.99}]},{"id":2,"name":"Great Northern Original Bottles Case 24x330mL","cat":"Beer","prices":[{"store":"BWS","price":51.0},{"store":"Liquorland","price":55.49},{"store":"First Choice Liquor","price":54.5},{"store":"IGA Liquor","price":51.49},{"store":"The Bottle-O","price":56.5},{"store":"Vintage Cellars","price":50.95}]},{"id":3,"name":"Carlton Draught Bottles Case 24x375mL","cat":"Beer","prices":[{"store":"Liquorland","price":58.95},{"store":"First Choice Liquor","price":54.5},{"store":"BWS","price":60.99},{"store":"Thirsty Camel","price":60.5},{"store":"The Bottle-O","price":58.0}]},{"id":4,"name":"Carlton Dry Bottles Case 24x330mL","cat":"Beer","prices":[{"store":"BWS","price":51.5},{"store":"First Choice Liquor","price":51.5},{"store":"Dan Murphy's","price":51.5},{"store":"IGA Liquor","price":54.0},{"store":"Cellarbrations","price":54.49},{"store":"Duncan's Liquor","price":53.49}]},{"id":5,"name":"VB Victoria Bitter Cans Case 30x375mL","cat":"Beer","prices":[{"store":"First Choice Liquor","price":56.0},{"store":"BWS","price":61.95},{"store":"Dan Murphy's","price":56.49},{"store":"Porters Liquor","price":61.99},{"store":"Thirsty Camel","price":61.5}]},{"id":6,"name":"XXXX Gold Cans 30 Block (375mL)","cat":"Beer","prices":[{"store":"First Choice Liquor","price":54.99},{"store":"BWS","price":56.99},{"store":"Liquorland","price":55.99},{"store":"Bottlemart","price":55.49},{"store":"Vintage Cellars","price":59.49},{"store":"Cellarbrations","price":56.0}]},{"id":7,"name":"Tooheys New Bottles Case 24x375mL","cat":"Beer","prices":[{"store":"BWS","price":56.95},{"store":"Liquorland","price":54.95},{"store":"Dan Murphy's","price":55.99},{"store":"Sip'n Save","price":58.0}]},{"id":8,"name":"Tooheys Extra Dry Bottles Case 24x345mL","cat":"Beer","prices":[{"store":"Liquorland","price":52.0},{"store":"First Choice Liquor","price":57.5},{"store":"BWS","price":57.49},{"store":"Cellarbrations","price":54.0},{"store":"Vintage Cellars","price":57.5},{"store":"IGA Liquor","price":56.99}]},{"id":9,"name":"Coopers Pale Ale Bottles Case 24x375mL","cat":"Beer","prices":[{"store":"Liquorland","price":64.0},{"store":"Dan Murphy's","price":67.5},{"store":"First Choice Liquor","price":61.49},{"store":"Porters Liquor","price":67.0}]},{"id":10,"name":"Coopers Sparkling Ale Bottles Case 24x375mL","cat":"Beer","prices":[{"store":"First Choice Liquor","price":64.99},{"store":"Dan Murphy's","price":70.95},{"store":"Liquorland","price":71.99},{"store":"Bottlemart","price":69.49},{"store":"The Bottle-O","price":69.95},{"store":"Vintage Cellars","price":71.5}]},{"id":11,"name":"Melbourne Bitter Bottles Case 24x375mL","cat":"Beer","prices":[{"store":"First Choice Liquor","price":54.49},{"store":"Dan Murphy's","price":54.0},{"store":"Liquorland","price":50.0},{"store":"BWS","price":51.0},{"store":"Cellarbrations","price":55.0},{"store":"Porters Liquor","price":53.5},{"store":"Thirsty Camel","price":54.49}]},{"id":12,"name":"Furphy Refreshing Ale Bottles Case 24x375mL","cat":"Beer","prices":[{"store":"First Choice Liquor","price":53.95},{"store":"Dan Murphy's","price":55.95},{"store":"BWS","price":56.0},{"store":"Sip'n Save","price":57.0},{"store":"IGA Liquor","price":53.5},{"store":"Thirsty Camel","price":58.0}]},{"id":13,"name":"Pure Blonde Ultra Low Carb Bottles Case 24x355mL","cat":"Beer","prices":[{"store":"BWS","price":52.5},{"store":"Liquorland","price":53.0},{"store":"First Choice Liquor","price":53.99},{"store":"Bottlemart","price":50.99}]},{"id":14,"name":"Hahn SuperDry Bottles Case 24x330mL","cat":"Beer","prices":[{"store":"BWS","price":54.95},{"store":"Dan Murphy's","price":57.49},{"store":"First Choice Liquor","price":53.95},{"store":"The Bottle-O","price":52.95}]},{"id":15,"name":"Hahn Premium Light Bottles Case 24x375mL","cat":"Beer","prices":[{"store":"First Choice Liquor","price":43.99},{"store":"Dan Murphy's","price":40.5},{"store":"Liquorland","price":40.99},{"store":"BWS","price":42.99},{"store":"IGA Liquor","price":40.99},{"store":"Thirsty Camel","price":40.49}]},{"id":16,"name":"Crown Lager Bottles Case 24x375mL","cat":"Beer","prices":[{"store":"Dan Murphy's","price":57.95},{"store":"Liquorland","price":62.0},{"store":"First Choice Liquor","price":62.95},{"store":"Sip'n Save","price":63.99},{"store":"Cellarbrations","price":62.5},{"store":"Vintage Cellars","price":59.5}]},{"id":17,"name":"James Boag's Premium Bottles Case 24x375mL","cat":"Beer","prices":[{"store":"First Choice Liquor","price":62.0},{"store":"Dan Murphy's","price":55.99},{"store":"BWS","price":62.0},{"store":"The Bottle-O","price":55.49},{"store":"Porters Liquor","price":58.49}]},{"id":18,"name":"Iron Jack Crisp Lager Cans 30 Block (375mL)","cat":"Beer","prices":[{"store":"BWS","price":57.5},{"store":"First Choice Liquor","price":56.99},{"store":"Liquorland","price":51.99},{"store":"Dan Murphy's","price":54.0},{"store":"The Bottle-O","price":58.49}]},{"id":19,"name":"Emu Export Cans 30 Block (375mL)","cat":"Beer","prices":[{"store":"Dan Murphy's","price":49.99},{"store":"Liquorland","price":51.5},{"store":"First Choice Liquor","price":51.5},{"store":"BWS","price":53.5},{"store":"Vintage Cellars","price":56.0}]},{"id":20,"name":"Swan Draught Cans 30 Block (375mL)","cat":"Beer","prices":[{"store":"First Choice Liquor","price":52.5},{"store":"BWS","price":53.95},{"store":"Dan Murphy's","price":55.95},{"store":"Thirsty Camel","price":55.0},{"store":"Porters Liquor","price":52.49},{"store":"Sip'n Save","price":55.5}]},{"id":21,"name":"Balter XPA Cans 16 Pack (375mL)","cat":"Beer","prices":[{"store":"BWS","price":67.49},{"store":"Dan Murphy's","price":65.0},{"store":"First Choice Liquor","price":62.99},{"store":"Porters Liquor","price":67.95},{"store":"Thirsty Camel","price":68.49}]},{"id":22,"name":"Balter Eazy Hazy Cans 16 Pack (375mL)","cat":"Beer","prices":[{"store":"BWS","price":68.5},{"store":"First Choice Liquor","price":68.95},{"store":"Dan Murphy's","price":68.49},{"store":"Bottlemart","price":64.0}]},{"id":23,"name":"Stone & Wood Pacific Ale Cans 16 Pack (375mL)","cat":"Beer","prices":[{"store":"First Choice Liquor","price":67.49},{"store":"Dan Murphy's","price":66.49},{"store":"Liquorland","price":68.5},{"store":"BWS","price":72.5},{"store":"Porters Liquor","price":68.99}]},{"id":24,"name":"Mountain Goat Very Enjoyable Beer Cans 24 Pack (375mL)","cat":"Beer","prices":[{"store":"Liquorland","price":57.95},{"store":"Dan Murphy's","price":59.5},{"store":"First Choice Liquor","price":60.99},{"store":"BWS","price":57.99},{"store":"Bottlemart","price":58.0},{"store":"Vintage Cellars","price":62.0},{"store":"Thirsty Camel","price":61.99}]},{"id":25,"name":"Young Henrys Newtowner Cans 16 Pack (375mL)","cat":"Beer","prices":[{"store":"First Choice Liquor","price":64.5},{"store":"Dan Murphy's","price":63.95},{"store":"BWS","price":61.5},{"store":"Porters Liquor","price":63.49},{"store":"Cellarbrations","price":62.95}]},{"id":26,"name":"4 Pines Pacific Ale Cans 16 Pack (375mL)","cat":"Beer","prices":[{"store":"Liquorland","price":61.99},{"store":"BWS","price":62.5},{"store":"Dan Murphy's","price":61.95},{"store":"Vintage Cellars","price":63.99},{"store":"Duncan's Liquor","price":61.49},{"store":"Cellarbrations","price":63.5}]},{"id":27,"name":"Bentspoke Crankshaft IPA Cans 16 Pack (375mL)","cat":"Beer","prices":[{"store":"BWS","price":71.0},{"store":"Liquorland","price":72.95},{"store":"First Choice Liquor","price":75.0},{"store":"Dan Murphy's","price":74.99},{"store":"IGA Liquor","price":71.95}]},{"id":28,"name":"Felons Crisp Lager Cans 24 Pack (375mL)","cat":"Beer","prices":[{"store":"BWS","price":61.99},{"store":"Dan Murphy's","price":63.99},{"store":"Liquorland","price":62.0},{"store":"First Choice Liquor","price":63.95},{"store":"Sip'n Save","price":65.99},{"store":"IGA Liquor","price":64.95}]},{"id":29,"name":"Corona Extra Bottles Case 24x355mL","cat":"Beer","prices":[{"store":"First Choice Liquor","price":62.99},{"store":"Dan Murphy's","price":60.49},{"store":"BWS","price":59.0},{"store":"Liquorland","price":62.49},{"store":"Vintage Cellars","price":59.5},{"store":"IGA Liquor","price":64.0},{"store":"Sip'n Save","price":58.49}]},{"id":30,"name":"Heineken Bottles Case 24x330mL","cat":"Beer","prices":[{"store":"BWS","price":59.95},{"store":"Liquorland","price":55.95},{"store":"Dan Murphy's","price":57.99},{"store":"First Choice Liquor","price":62.0},{"store":"Sip'n Save","price":61.99},{"store":"Duncan's Liquor","price":57.0},{"store":"Bottlemart","price":62.5}]},{"id":31,"name":"Peroni Nastro Azzurro Bottles Case 24x330mL","cat":"Beer","prices":[{"store":"BWS","price":57.5},{"store":"First Choice Liquor","price":62.95},{"store":"Dan Murphy's","price":62.95},{"store":"Liquorland","price":64.99},{"store":"Sip'n Save","price":61.95},{"store":"The Bottle-O","price":61.0}]},{"id":32,"name":"Asahi Super Dry Bottles Case 24x330mL","cat":"Beer","prices":[{"store":"First Choice Liquor","price":58.49},{"store":"Dan Murphy's","price":59.5},{"store":"BWS","price":61.95},{"store":"Bottlemart","price":58.95},{"store":"Thirsty Camel","price":57.0},{"store":"Duncan's Liquor","price":59.99}]},{"id":33,"name":"Stella Artois Bottles Case 24x330mL","cat":"Beer","prices":[{"store":"BWS","price":62.49},{"store":"Liquorland","price":61.99},{"store":"Dan Murphy's","price":56.49},{"store":"Thirsty Camel","price":58.0},{"store":"Duncan's Liquor","price":59.49}]},{"id":34,"name":"Guinness Draught Cans 24 Pack (440mL)","cat":"Beer","prices":[{"store":"Liquorland","price":86.5},{"store":"BWS","price":86.95},{"store":"Dan Murphy's","price":84.49},{"store":"First Choice Liquor","price":80.49},{"store":"Bottlemart","price":81.5},{"store":"Vintage Cellars","price":89.99},{"store":"Thirsty Camel","price":88.99}]},{"id":35,"name":"Kirin Megumi Bottles Case 24x330mL","cat":"Beer","prices":[{"store":"First Choice Liquor","price":56.95},{"store":"Liquorland","price":62.0},{"store":"BWS","price":59.5},{"store":"Cellarbrations","price":60.95},{"store":"Porters Liquor","price":61.95}]},{"id":36,"name":"Tsingtao Bottles Case 24x330mL","cat":"Beer","prices":[{"store":"Liquorland","price":55.5},{"store":"First Choice Liquor","price":52.49},{"store":"BWS","price":55.0},{"store":"The Bottle-O","price":51.95},{"store":"Sip'n Save","price":51.95},{"store":"Duncan's Liquor","price":53.95}]},{"id":37,"name":"Penfolds Bin 28 Shiraz 750mL","cat":"Red Wine","prices":[{"store":"First Choice Liquor","price":41.5},{"store":"BWS","price":41.99},{"store":"Dan Murphy's","price":43.5},{"store":"Liquorland","price":43.99},{"store":"IGA Liquor","price":45.0}]},{"id":38,"name":"Penfolds Bin 389 Cabernet Shiraz 750mL","cat":"Red Wine","prices":[{"store":"First Choice Liquor","price":108.0},{"store":"BWS","price":101.95},{"store":"Dan Murphy's","price":107.5},{"store":"The Bottle-O","price":107.5},{"store":"Duncan's Liquor","price":104.99},{"store":"IGA Liquor","price":102.99}]},{"id":39,"name":"Penfolds Koonunga Hill Shiraz Cabernet 750mL","cat":"Red Wine","prices":[{"store":"First Choice Liquor","price":15.5},{"store":"BWS","price":14.99},{"store":"Liquorland","price":15.49},{"store":"Dan Murphy's","price":14.95},{"store":"IGA Liquor","price":14.99},{"store":"Cellarbrations","price":15.99}]},{"id":40,"name":"19 Crimes Red Blend 750mL","cat":"Red Wine","prices":[{"store":"BWS","price":13.99},{"store":"First Choice Liquor","price":13.0},{"store":"Dan Murphy's","price":14.99},{"store":"Liquorland","price":13.49},{"store":"Bottlemart","price":14.95}]},{"id":41,"name":"Pepperjack Barossa Shiraz 750mL","cat":"Red Wine","prices":[{"store":"Liquorland","price":22.0},{"store":"BWS","price":22.95},{"store":"First Choice Liquor","price":22.0},{"store":"The Bottle-O","price":23.0}]},{"id":42,"name":"Wolf Blass Yellow Label Cabernet Sauvignon 750mL","cat":"Red Wine","prices":[{"store":"BWS","price":11.0},{"store":"Liquorland","price":10.95},{"store":"First Choice Liquor","price":10.99},{"store":"Cellarbrations","price":10.99}]},{"id":43,"name":"Wynns Coonawarra Black Label Cabernet 750mL","cat":"Red Wine","prices":[{"store":"First Choice Liquor","price":45.49},{"store":"BWS","price":43.5},{"store":"Liquorland","price":43.49},{"store":"Dan Murphy's","price":41.99},{"store":"Thirsty Camel","price":40.0},{"store":"Cellarbrations","price":42.99}]},{"id":44,"name":"St Hallett Faith Shiraz 750mL","cat":"Red Wine","prices":[{"store":"Dan Murphy's","price":19.95},{"store":"First Choice Liquor","price":22.99},{"store":"BWS","price":21.49},{"store":"Liquorland","price":21.99},{"store":"The Bottle-O","price":20.49},{"store":"Cellarbrations","price":22.49}]},{"id":45,"name":"Taylors Estate Shiraz 750mL","cat":"Red Wine","prices":[{"store":"BWS","price":17.5},{"store":"First Choice Liquor","price":18.5},{"store":"Liquorland","price":18.95},{"store":"The Bottle-O","price":17.99}]},{"id":46,"name":"Yalumba Y Series Shiraz Viognier 750mL","cat":"Red Wine","prices":[{"store":"Liquorland","price":12.99},{"store":"First Choice Liquor","price":12.0},{"store":"BWS","price":13.5},{"store":"Thirsty Camel","price":12.49},{"store":"Cellarbrations","price":12.95}]},{"id":47,"name":"d'Arenberg The Footbolt Shiraz 750mL","cat":"Red Wine","prices":[{"store":"First Choice Liquor","price":20.5},{"store":"Liquorland","price":20.0},{"store":"BWS","price":22.5},{"store":"Dan Murphy's","price":21.95},{"store":"The Bottle-O","price":20.95}]},{"id":48,"name":"Grant Burge Filsell Old Vine Shiraz 750mL","cat":"Red Wine","prices":[{"store":"Dan Murphy's","price":34.95},{"store":"BWS","price":39.0},{"store":"Liquorland","price":38.99},{"store":"Porters Liquor","price":37.0},{"store":"Cellarbrations","price":35.5}]},{"id":49,"name":"De Bortoli Woodfired Heathcote Shiraz 750mL","cat":"Red Wine","prices":[{"store":"First Choice Liquor","price":16.95},{"store":"Dan Murphy's","price":16.99},{"store":"Liquorland","price":17.49},{"store":"BWS","price":16.0},{"store":"Duncan's Liquor","price":17.0},{"store":"Bottlemart","price":16.0},{"store":"The Bottle-O","price":16.0}]},{"id":50,"name":"Jacob's Creek Double Barrel Shiraz 750mL","cat":"Red Wine","prices":[{"store":"Liquorland","price":17.49},{"store":"First Choice Liquor","price":15.49},{"store":"BWS","price":15.99},{"store":"Sip'n Save","price":16.49},{"store":"The Bottle-O","price":16.5}]},{"id":51,"name":"Squealing Pig Pinot Noir 750mL","cat":"Red Wine","prices":[{"store":"Liquorland","price":16.95},{"store":"Dan Murphy's","price":16.99},{"store":"BWS","price":17.95},{"store":"First Choice Liquor","price":16.5},{"store":"The Bottle-O","price":17.49},{"store":"Bottlemart","price":17.49}]},{"id":52,"name":"Yering Station Village Pinot Noir 750mL","cat":"Red Wine","prices":[{"store":"Liquorland","price":24.49},{"store":"First Choice Liquor","price":23.0},{"store":"BWS","price":22.99},{"store":"Dan Murphy's","price":22.0},{"store":"Sip'n Save","price":24.95}]},{"id":53,"name":"Devil's Lair Hidden Cave Cabernet Sauvignon 750mL","cat":"Red Wine","prices":[{"store":"First Choice Liquor","price":19.5},{"store":"Dan Murphy's","price":18.95},{"store":"Liquorland","price":19.5},{"store":"Sip'n Save","price":20.99},{"store":"Bottlemart","price":18.5},{"store":"Thirsty Camel","price":19.95}]},{"id":54,"name":"Oyster Bay Sauvignon Blanc 750mL","cat":"White Wine","prices":[{"store":"Dan Murphy's","price":16.9},{"store":"First Choice Liquor","price":18.0},{"store":"BWS","price":17.5},{"store":"IGA Liquor","price":19.0},{"store":"Cellarbrations","price":17.0},{"store":"Duncan's Liquor","price":17.5}]},{"id":55,"name":"Villa Maria Private Bin Sauvignon Blanc 750mL","cat":"White Wine","prices":[{"store":"BWS","price":15.99},{"store":"Liquorland","price":16.99},{"store":"First Choice Liquor","price":16.95},{"store":"Dan Murphy's","price":16.49},{"store":"Bottlemart","price":15.5}]},{"id":56,"name":"Squealing Pig Pinot Gris 750mL","cat":"White Wine","prices":[{"store":"Dan Murphy's","price":15.95},{"store":"BWS","price":18.5},{"store":"Liquorland","price":17.95},{"store":"First Choice Liquor","price":17.95},{"store":"Cellarbrations","price":17.49},{"store":"The Bottle-O","price":18.95}]},{"id":57,"name":"Shaw + Smith Sauvignon Blanc 750mL","cat":"White Wine","prices":[{"store":"First Choice Liquor","price":28.5},{"store":"Liquorland","price":25.95},{"store":"BWS","price":25.99},{"store":"Vintage Cellars","price":27.0}]},{"id":58,"name":"Vasse Felix Filius Chardonnay 750mL","cat":"White Wine","prices":[{"store":"BWS","price":29.49},{"store":"Liquorland","price":29.0},{"store":"First Choice Liquor","price":28.95},{"store":"Dan Murphy's","price":27.5},{"store":"IGA Liquor","price":29.0},{"store":"Vintage Cellars","price":30.5}]},{"id":59,"name":"Leeuwin Estate Prelude Chardonnay 750mL","cat":"White Wine","prices":[{"store":"BWS","price":36.95},{"store":"Dan Murphy's","price":39.5},{"store":"First Choice Liquor","price":38.5},{"store":"Liquorland","price":38.95},{"store":"Bottlemart","price":39.49}]},{"id":60,"name":"Penfolds Koonunga Hill Chardonnay 750mL","cat":"White Wine","prices":[{"store":"First Choice Liquor","price":14.0},{"store":"Liquorland","price":14.5},{"store":"BWS","price":15.5},{"store":"Cellarbrations","price":14.49},{"store":"Sip'n Save","price":14.99},{"store":"Thirsty Camel","price":15.99}]},{"id":61,"name":"Brown Brothers Moscato 750mL","cat":"White Wine","prices":[{"store":"BWS","price":13.0},{"store":"Liquorland","price":13.95},{"store":"Dan Murphy's","price":13.49},{"store":"First Choice Liquor","price":14.49},{"store":"Vintage Cellars","price":13.5},{"store":"Sip'n Save","price":14.99},{"store":"Thirsty Camel","price":13.49}]},{"id":62,"name":"Pewsey Vale Eden Valley Riesling 750mL","cat":"White Wine","prices":[{"store":"Dan Murphy's","price":19.95},{"store":"BWS","price":21.49},{"store":"Liquorland","price":22.0},{"store":"First Choice Liquor","price":22.5},{"store":"Thirsty Camel","price":21.5},{"store":"Porters Liquor","price":20.5},{"store":"Cellarbrations","price":20.0}]},{"id":63,"name":"Giesen Estate Sauvignon Blanc 750mL","cat":"White Wine","prices":[{"store":"BWS","price":14.49},{"store":"Liquorland","price":15.49},{"store":"Dan Murphy's","price":14.99},{"store":"First Choice Liquor","price":14.49},{"store":"Porters Liquor","price":15.49}]},{"id":64,"name":"Rob Dolan True Colours Chardonnay 750mL","cat":"White Wine","prices":[{"store":"Dan Murphy's","price":17.95},{"store":"BWS","price":19.0},{"store":"First Choice Liquor","price":19.0},{"store":"Liquorland","price":18.5},{"store":"Duncan's Liquor","price":19.49}]},{"id":65,"name":"Grant Burge Benchmark Pinot Gris 750mL","cat":"White Wine","prices":[{"store":"BWS","price":12.0},{"store":"First Choice Liquor","price":12.5},{"store":"Dan Murphy's","price":12.0},{"store":"Liquorland","price":12.49},{"store":"Sip'n Save","price":13.0}]},{"id":66,"name":"AIX Rose 750mL","cat":"Rosé","prices":[{"store":"Dan Murphy's","price":29.95},{"store":"First Choice Liquor","price":32.95},{"store":"BWS","price":30.0},{"store":"Liquorland","price":31.49},{"store":"Sip'n Save","price":30.5},{"store":"Cellarbrations","price":32.99}]},{"id":67,"name":"Squealing Pig Rose 750mL","cat":"Rosé","prices":[{"store":"Liquorland","price":16.49},{"store":"BWS","price":16.95},{"store":"First Choice Liquor","price":16.0},{"store":"Dan Murphy's","price":16.5},{"store":"Cellarbrations","price":17.5},{"store":"IGA Liquor","price":18.95}]},{"id":68,"name":"La Vieille Ferme Rose 750mL","cat":"Rosé","prices":[{"store":"Dan Murphy's","price":13.95},{"store":"First Choice Liquor","price":15.99},{"store":"BWS","price":14.99},{"store":"Cellarbrations","price":15.0}]},{"id":69,"name":"Chandon Brut NV Sparkling 750mL","cat":"Sparkling","prices":[{"store":"First Choice Liquor","price":25.99},{"store":"Liquorland","price":25.95},{"store":"Dan Murphy's","price":25.0},{"store":"BWS","price":26.99},{"store":"Vintage Cellars","price":26.5},{"store":"Porters Liquor","price":26.95}]},{"id":70,"name":"Chandon Garden Spritz 750mL","cat":"Sparkling","prices":[{"store":"Liquorland","price":31.49},{"store":"Dan Murphy's","price":33.99},{"store":"First Choice Liquor","price":32.0},{"store":"Vintage Cellars","price":30.0},{"store":"Duncan's Liquor","price":30.99},{"store":"Bottlemart","price":30.95}]},{"id":71,"name":"Moet & Chandon Imperial Brut NV 750mL","cat":"Sparkling","prices":[{"store":"BWS","price":71.99},{"store":"First Choice Liquor","price":70.0},{"store":"Liquorland","price":72.95},{"store":"Dan Murphy's","price":74.95},{"store":"Cellarbrations","price":74.49},{"store":"Thirsty Camel","price":77.0}]},{"id":72,"name":"Veuve Clicquot Yellow Label Brut NV 750mL","cat":"Sparkling","prices":[{"store":"Dan Murphy's","price":84.95},{"store":"BWS","price":96.0},{"store":"Liquorland","price":85.5},{"store":"First Choice Liquor","price":96.49},{"store":"Thirsty Camel","price":94.5},{"store":"IGA Liquor","price":88.0}]},{"id":73,"name":"Piper-Heidsieck Cuvee Brut NV 750mL","cat":"Sparkling","prices":[{"store":"First Choice Liquor","price":64.5},{"store":"Dan Murphy's","price":60.0},{"store":"Liquorland","price":63.95},{"store":"BWS","price":67.5},{"store":"Duncan's Liquor","price":64.99},{"store":"IGA Liquor","price":63.95},{"store":"Vintage Cellars","price":62.95}]},{"id":74,"name":"De Bortoli Prosecco King Valley 750mL","cat":"Sparkling","prices":[{"store":"BWS","price":15.0},{"store":"Liquorland","price":15.99},{"store":"First Choice Liquor","price":15.0},{"store":"Porters Liquor","price":15.5},{"store":"Cellarbrations","price":16.49}]},{"id":75,"name":"Brown Brothers Prosecco NV 750mL","cat":"Sparkling","prices":[{"store":"Dan Murphy's","price":15.95},{"store":"Liquorland","price":17.49},{"store":"First Choice Liquor","price":16.49},{"store":"BWS","price":16.49},{"store":"Porters Liquor","price":17.0}]},{"id":76,"name":"Yellowglen Yellow NV 750mL","cat":"Sparkling","prices":[{"store":"First Choice Liquor","price":9.95},{"store":"BWS","price":9.5},{"store":"Liquorland","price":9.99},{"store":"Porters Liquor","price":9.99},{"store":"Duncan's Liquor","price":9.95},{"store":"Cellarbrations","price":9.0}]},{"id":77,"name":"Smirnoff Red Label Vodka 1L","cat":"Spirits","prices":[{"store":"Dan Murphy's","price":51.95},{"store":"Liquorland","price":58.99},{"store":"First Choice Liquor","price":56.5},{"store":"BWS","price":56.99},{"store":"The Bottle-O","price":53.0},{"store":"Thirsty Camel","price":55.5}]},{"id":78,"name":"Absolut Vodka 700mL","cat":"Spirits","prices":[{"store":"BWS","price":53.49},{"store":"Dan Murphy's","price":52.5},{"store":"Liquorland","price":52.5},{"store":"The Bottle-O","price":54.0},{"store":"Duncan's Liquor","price":55.5},{"store":"Vintage Cellars","price":50.0}]},{"id":79,"name":"Grey Goose Vodka 700mL","cat":"Spirits","prices":[{"store":"Liquorland","price":90.5},{"store":"First Choice Liquor","price":90.95},{"store":"Dan Murphy's","price":81.0},{"store":"BWS","price":83.95},{"store":"Cellarbrations","price":87.5},{"store":"Bottlemart","price":89.99}]},{"id":80,"name":"Bundaberg UP Rum 700mL","cat":"Spirits","prices":[{"store":"First Choice Liquor","price":54.49},{"store":"Liquorland","price":55.95},{"store":"BWS","price":54.49},{"store":"Thirsty Camel","price":54.5},{"store":"Porters Liquor","price":59.0},{"store":"Bottlemart","price":56.99}]},{"id":81,"name":"Bacardi Carta Blanca White Rum 700mL","cat":"Spirits","prices":[{"store":"Liquorland","price":49.99},{"store":"First Choice Liquor","price":53.49},{"store":"Dan Murphy's","price":52.0},{"store":"Sip'n Save","price":50.49},{"store":"Bottlemart","price":54.99},{"store":"Cellarbrations","price":49.95}]},{"id":82,"name":"Sailor Jerry Spiced Rum 700mL","cat":"Spirits","prices":[{"store":"BWS","price":62.95},{"store":"First Choice Liquor","price":58.5},{"store":"Liquorland","price":60.99},{"store":"IGA Liquor","price":59.49},{"store":"Porters Liquor","price":61.99},{"store":"The Bottle-O","price":56.5}]},{"id":83,"name":"Kraken Black Spiced Rum 700mL","cat":"Spirits","prices":[{"store":"First Choice Liquor","price":63.49},{"store":"BWS","price":65.99},{"store":"Dan Murphy's","price":64.95},{"store":"Duncan's Liquor","price":63.49},{"store":"Cellarbrations","price":70.5},{"store":"Bottlemart","price":71.95}]},{"id":84,"name":"Jack Daniel's Old No.7 Tennessee Whiskey 700mL","cat":"Spirits","prices":[{"store":"Liquorland","price":59.5},{"store":"Dan Murphy's","price":65.5},{"store":"BWS","price":64.49},{"store":"Cellarbrations","price":58.95},{"store":"Porters Liquor","price":63.49}]},{"id":85,"name":"Jim Beam White Label Bourbon 1L","cat":"Spirits","prices":[{"store":"Dan Murphy's","price":56.99},{"store":"First Choice Liquor","price":64.99},{"store":"Liquorland","price":61.0},{"store":"BWS","price":63.49},{"store":"IGA Liquor","price":59.0},{"store":"Bottlemart","price":58.99}]},{"id":86,"name":"Maker's Mark Bourbon 700mL","cat":"Spirits","prices":[{"store":"Dan Murphy's","price":64.95},{"store":"BWS","price":68.99},{"store":"First Choice Liquor","price":68.99},{"store":"Liquorland","price":68.0},{"store":"Bottlemart","price":69.5}]},{"id":87,"name":"Jameson Irish Whiskey 700mL","cat":"Spirits","prices":[{"store":"Dan Murphy's","price":54.95},{"store":"BWS","price":60.5},{"store":"Liquorland","price":61.5},{"store":"Thirsty Camel","price":56.0},{"store":"Sip'n Save","price":60.5},{"store":"Bottlemart","price":55.5}]},{"id":88,"name":"Johnnie Walker Black Label Scotch 700mL","cat":"Spirits","prices":[{"store":"BWS","price":71.95},{"store":"Liquorland","price":65.49},{"store":"First Choice Liquor","price":65.49},{"store":"Dan Murphy's","price":73.5},{"store":"Bottlemart","price":73.99},{"store":"Duncan's Liquor","price":68.99},{"store":"Thirsty Camel","price":69.0}]},{"id":89,"name":"Glenfiddich 12YO Single Malt 700mL","cat":"Spirits","prices":[{"store":"Liquorland","price":94.95},{"store":"Dan Murphy's","price":95.95},{"store":"BWS","price":95.95},{"store":"Vintage Cellars","price":88.49},{"store":"Cellarbrations","price":90.95}]},{"id":90,"name":"Glenmorangie Original 10YO 700mL","cat":"Spirits","prices":[{"store":"Liquorland","price":83.0},{"store":"Dan Murphy's","price":80.5},{"store":"BWS","price":83.99},{"store":"First Choice Liquor","price":87.49},{"store":"Sip'n Save","price":87.5},{"store":"Bottlemart","price":84.5},{"store":"Vintage Cellars","price":86.95}]},{"id":91,"name":"Chivas Regal 12YO Scotch 700mL","cat":"Spirits","prices":[{"store":"Dan Murphy's","price":59.95},{"store":"First Choice Liquor","price":67.95},{"store":"BWS","price":60.0},{"store":"Liquorland","price":61.5},{"store":"Duncan's Liquor","price":62.99},{"store":"Bottlemart","price":60.49},{"store":"Thirsty Camel","price":65.5}]},{"id":92,"name":"Canadian Club Whisky 1L","cat":"Spirits","prices":[{"store":"Dan Murphy's","price":56.95},{"store":"Liquorland","price":58.0},{"store":"First Choice Liquor","price":57.49},{"store":"BWS","price":60.95},{"store":"Sip'n Save","price":64.0},{"store":"Porters Liquor","price":59.5}]},{"id":93,"name":"Gordon's London Dry Gin 700mL","cat":"Spirits","prices":[{"store":"Liquorland","price":40.0},{"store":"First Choice Liquor","price":42.95},{"store":"BWS","price":45.5},{"store":"Dan Murphy's","price":43.0},{"store":"Cellarbrations","price":43.5}]},{"id":94,"name":"Bombay Sapphire Gin 700mL","cat":"Spirits","prices":[{"store":"BWS","price":61.49},{"store":"First Choice Liquor","price":61.0},{"store":"Dan Murphy's","price":57.99},{"store":"Liquorland","price":57.99},{"store":"IGA Liquor","price":55.0}]},{"id":95,"name":"Tanqueray London Dry Gin 700mL","cat":"Spirits","prices":[{"store":"First Choice Liquor","price":63.99},{"store":"Liquorland","price":57.5},{"store":"BWS","price":62.95},{"store":"Duncan's Liquor","price":60.99},{"store":"Sip'n Save","price":59.99}]},{"id":96,"name":"Hendrick's Gin 700mL","cat":"Spirits","prices":[{"store":"First Choice Liquor","price":85.5},{"store":"Liquorland","price":81.5},{"store":"Dan Murphy's","price":90.49},{"store":"Cellarbrations","price":83.99}]},{"id":97,"name":"Four Pillars Rare Dry Gin 700mL","cat":"Spirits","prices":[{"store":"Liquorland","price":81.0},{"store":"Dan Murphy's","price":80.49},{"store":"BWS","price":81.99},{"store":"First Choice Liquor","price":76.99},{"store":"Vintage Cellars","price":82.99}]},{"id":98,"name":"Archie Rose Signature Dry Gin 700mL","cat":"Spirits","prices":[{"store":"Dan Murphy's","price":79.99},{"store":"First Choice Liquor","price":84.0},{"store":"Liquorland","price":85.99},{"store":"BWS","price":83.5},{"store":"Vintage Cellars","price":85.95},{"store":"IGA Liquor","price":83.0},{"store":"Sip'n Save","price":87.49}]},{"id":99,"name":"Jose Cuervo Especial Reposado Tequila 700mL","cat":"Spirits","prices":[{"store":"First Choice Liquor","price":61.5},{"store":"BWS","price":60.5},{"store":"Dan Murphy's","price":62.49},{"store":"Liquorland","price":60.99},{"store":"Bottlemart","price":59.5},{"store":"Porters Liquor","price":56.0}]},{"id":100,"name":"Espolon Blanco Tequila 700mL","cat":"Spirits","prices":[{"store":"BWS","price":72.95},{"store":"Dan Murphy's","price":67.49},{"store":"Liquorland","price":72.99},{"store":"First Choice Liquor","price":71.49},{"store":"Vintage Cellars","price":71.95},{"store":"Sip'n Save","price":74.95}]},{"id":101,"name":"Baileys Original Irish Cream 700mL","cat":"Spirits","prices":[{"store":"First Choice Liquor","price":39.49},{"store":"Dan Murphy's","price":37.0},{"store":"Liquorland","price":35.95},{"store":"BWS","price":37.95},{"store":"Duncan's Liquor","price":36.0},{"store":"The Bottle-O","price":39.95}]},{"id":102,"name":"Kahlua Coffee Liqueur 700mL","cat":"Spirits","prices":[{"store":"Liquorland","price":40.99},{"store":"BWS","price":41.99},{"store":"First Choice Liquor","price":41.95},{"store":"Thirsty Camel","price":42.99},{"store":"Sip'n Save","price":41.99}]},{"id":103,"name":"Aperol 700mL","cat":"Spirits","prices":[{"store":"Dan Murphy's","price":29.99},{"store":"BWS","price":33.49},{"store":"Liquorland","price":30.99},{"store":"Porters Liquor","price":31.0}]},{"id":104,"name":"Campari 700mL","cat":"Spirits","prices":[{"store":"BWS","price":42.49},{"store":"Liquorland","price":43.99},{"store":"First Choice Liquor","price":40.99},{"store":"The Bottle-O","price":41.95}]},{"id":105,"name":"Midori Melon Liqueur 700mL","cat":"Spirits","prices":[{"store":"Liquorland","price":38.0},{"store":"First Choice Liquor","price":42.99},{"store":"BWS","price":38.0},{"store":"Dan Murphy's","price":40.5},{"store":"The Bottle-O","price":41.99},{"store":"Thirsty Camel","price":39.0},{"store":"Bottlemart","price":39.49}]},{"id":106,"name":"Ouzo 12 700mL","cat":"Spirits","prices":[{"store":"BWS","price":42.95},{"store":"Dan Murphy's","price":40.49},{"store":"Liquorland","price":42.99},{"store":"First Choice Liquor","price":45.0},{"store":"Thirsty Camel","price":43.99}]},{"id":107,"name":"Canadian Club & Dry Cans 10 Pack (375mL)","cat":"Premix","prices":[{"store":"Liquorland","price":56.95},{"store":"First Choice Liquor","price":56.5},{"store":"BWS","price":53.5},{"store":"Duncan's Liquor","price":54.49},{"store":"Sip'n Save","price":56.5},{"store":"Bottlemart","price":53.49}]},{"id":108,"name":"Jack Daniel's & Cola Cans 10 Pack (375mL)","cat":"Premix","prices":[{"store":"BWS","price":59.5},{"store":"Liquorland","price":57.99},{"store":"First Choice Liquor","price":60.95},{"store":"Dan Murphy's","price":61.95},{"store":"The Bottle-O","price":61.49},{"store":"Porters Liquor","price":57.5}]},{"id":109,"name":"Jim Beam & Cola Cans 10 Pack (375mL)","cat":"Premix","prices":[{"store":"First Choice Liquor","price":51.99},{"store":"Liquorland","price":51.99},{"store":"BWS","price":54.49},{"store":"The Bottle-O","price":50.99},{"store":"IGA Liquor","price":51.0}]},{"id":110,"name":"Bundaberg Rum & Cola Cans 10 Pack (375mL)","cat":"Premix","prices":[{"store":"BWS","price":56.49},{"store":"Dan Murphy's","price":52.99},{"store":"Liquorland","price":60.49},{"store":"Sip'n Save","price":55.95},{"store":"Porters Liquor","price":56.49},{"store":"The Bottle-O","price":58.5}]},{"id":111,"name":"UDL Vodka Raspberry Cans 10 Pack (375mL)","cat":"Premix","prices":[{"store":"Dan Murphy's","price":44.95},{"store":"First Choice Liquor","price":50.0},{"store":"Liquorland","price":51.95},{"store":"BWS","price":49.49},{"store":"Bottlemart","price":50.5},{"store":"Sip'n Save","price":50.0}]},{"id":112,"name":"Smirnoff Ice Double Black Cans 10 Pack (375mL)","cat":"Premix","prices":[{"store":"Dan Murphy's","price":49.99},{"store":"BWS","price":53.49},{"store":"Liquorland","price":55.5},{"store":"First Choice Liquor","price":51.95},{"store":"Duncan's Liquor","price":54.49},{"store":"The Bottle-O","price":50.5},{"store":"Cellarbrations","price":55.99}]},{"id":113,"name":"-196 Double Lemon Cans 10 Pack (330mL)","cat":"Premix","prices":[{"store":"First Choice Liquor","price":57.0},{"store":"BWS","price":56.49},{"store":"Liquorland","price":58.49},{"store":"Cellarbrations","price":54.95}]},{"id":114,"name":"Hard Rated Lemon Cans 10 Pack (375mL)","cat":"Premix","prices":[{"store":"Liquorland","price":49.49},{"store":"BWS","price":45.0},{"store":"First Choice Liquor","price":47.49},{"store":"Thirsty Camel","price":47.99},{"store":"Vintage Cellars","price":50.5}]},{"id":115,"name":"Vodka Cruiser Wild Raspberry Bottles 10 Pack (275mL)","cat":"Premix","prices":[{"store":"Liquorland","price":45.99},{"store":"BWS","price":47.99},{"store":"Dan Murphy's","price":50.99},{"store":"IGA Liquor","price":49.49},{"store":"Bottlemart","price":49.99},{"store":"Duncan's Liquor","price":50.0}]},{"id":116,"name":"Billson's Vodka Green Apple Cans 4 Pack (355mL)","cat":"Premix","prices":[{"store":"Liquorland","price":21.49},{"store":"Dan Murphy's","price":20.99},{"store":"First Choice Liquor","price":21.49},{"store":"BWS","price":21.95},{"store":"Duncan's Liquor","price":20.99},{"store":"IGA Liquor","price":21.0},{"store":"Vintage Cellars","price":21.99}]},{"id":117,"name":"Gordon's Gin & Tonic Cans 10 Pack (375mL)","cat":"Premix","prices":[{"store":"Dan Murphy's","price":49.95},{"store":"Liquorland","price":55.49},{"store":"BWS","price":53.0},{"store":"First Choice Liquor","price":52.0},{"store":"Thirsty Camel","price":53.0},{"store":"Sip'n Save","price":56.0}]},{"id":118,"name":"Somersby Apple Cider Cans 10 Pack (375mL)","cat":"Cider","prices":[{"store":"Liquorland","price":42.95},{"store":"BWS","price":42.95},{"store":"Dan Murphy's","price":42.99},{"store":"First Choice Liquor","price":40.5},{"store":"Sip'n Save","price":40.99}]},{"id":119,"name":"Strongbow Original Apple Cider Bottles 10 Pack (355mL)","cat":"Cider","prices":[{"store":"BWS","price":41.99},{"store":"Liquorland","price":40.95},{"store":"Dan Murphy's","price":42.49},{"store":"First Choice Liquor","price":40.49},{"store":"Thirsty Camel","price":39.0},{"store":"Vintage Cellars","price":38.95},{"store":"IGA Liquor","price":41.0}]},{"id":120,"name":"Mercury Hard Cider Cans 10 Pack (375mL)","cat":"Cider","prices":[{"store":"Dan Murphy's","price":41.99},{"store":"First Choice Liquor","price":45.0},{"store":"Liquorland","price":43.0},{"store":"The Bottle-O","price":44.49}]},{"id":121,"name":"Little Fat Lamb Brewed Ginger 1.25L","cat":"Cider","prices":[{"store":"BWS","price":16.99},{"store":"Liquorland","price":15.99},{"store":"First Choice Liquor","price":16.5},{"store":"IGA Liquor","price":15.49}]},{"id":122,"name":"5 Seeds Crisp Apple Cider Bottles 10 Pack (345mL)","cat":"Cider","prices":[{"store":"Liquorland","price":40.95},{"store":"BWS","price":39.0},{"store":"Dan Murphy's","price":41.95},{"store":"Duncan's Liquor","price":41.5},{"store":"Bottlemart","price":40.95}]}];
+
+async function loadLive(){
+  try{
+    const r=await fetch('/api/prices');
+    if(r.ok){const j=await r.json();
+      if(j.products&&j.products.length){products.length=0;products.push(...j.products);}
+      if(j.updated){document.getElementById('count').title='Prices updated '+new Date(j.updated).toLocaleString('en-AU');}
+    }
+    const c=await fetch('/api/community');
+    if(c.ok){const list=await c.json();if(Array.isArray(list)){communityPrices.length=0;communityPrices.push(...list);}}
+  }catch(e){/* offline or API not deployed — embedded data stays */}
+  render();
+}
+let activeCat = "All";
+let communityPrices = []; // in-memory; swap for localStorage/backend on deploy
+
+const cats = ["All", ...new Set(products.map(p=>p.cat))];
+const filterBox = document.getElementById('filters');
+cats.forEach(c=>{
+  const b=document.createElement('button');
+  b.className='chip'+(c==='All'?' active':'');
+  b.textContent=c;
+  b.onclick=()=>{activeCat=c;document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.textContent===c));render();};
+  filterBox.appendChild(b);
+});
+
+function allPrices(p){
+  const extra = communityPrices.filter(c=>c.id===p.id).map(c=>({store:c.store+" ("+c.suburb+")",price:c.price,community:true}));
+  return [...p.prices,...extra].sort((a,b)=>a.price-b.price);
+}
+
+
+const storeSearch = {
+ "Dan Murphy's": q=>`https://www.danmurphys.com.au/search?searchTerm=${q}`,
+ "BWS": q=>`https://bws.com.au/search?searchTerm=${q}`,
+ "Liquorland": q=>`https://www.liquorland.com.au/search?q=${q}`,
+ "First Choice Liquor": q=>`https://www.firstchoiceliquor.com.au/search?q=${q}`,
+ "Vintage Cellars": q=>`https://www.vintagecellars.com.au/search?q=${q}`,
+ "Thirsty Camel": q=>`https://thirstycamel.com.au/?s=${q}`,
+ "Cellarbrations": q=>`https://www.cellarbrations.com.au/search?q=${q}`,
+ "Bottlemart": q=>`https://bottlemart.com.au/search?q=${q}`,
+ "IGA Liquor": q=>`https://www.igaliquor.com.au/search?q=${q}`,
+ "Porters Liquor": q=>`https://www.portersliquor.com.au/search?q=${q}`,
+ "Sip'n Save": q=>`https://www.sipnsave.com.au/search?q=${q}`,
+ "The Bottle-O": q=>`https://www.bottleo.com.au/search?q=${q}`
+};
+function storeLink(store,productName){
+  const q=encodeURIComponent(productName);
+  const fn=storeSearch[store];
+  const url=fn?fn(q):`https://www.google.com/search?q=${encodeURIComponent(store+" "+productName)}`;
+  return `<a href="${url}" target="_blank" rel="noopener" class="storelink">${store}</a>`;
+}
+
+function render(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const sort=document.getElementById('sort').value;
+  let list=products.filter(p=>(activeCat==='All'||p.cat===activeCat)&&p.name.toLowerCase().includes(q));
+  const enriched=list.map(p=>{const pr=allPrices(p);return{...p,pr,best:pr[0].price,save:pr[pr.length-1].price-pr[0].price};});
+  if(sort==='price')enriched.sort((a,b)=>a.best-b.best);
+  else if(sort==='savings')enriched.sort((a,b)=>b.save-a.save);
+  else enriched.sort((a,b)=>a.name.localeCompare(b.name));
+
+  document.getElementById('count').textContent=enriched.length+" product"+(enriched.length!==1?"s":"")+" · "+activeCat;
+  const grid=document.getElementById('grid');
+  if(!enriched.length){grid.innerHTML='<div class="empty"><div class="display">Nothing on the shelf</div><p>Try a different search or category.</p></div>';return;}
+
+  grid.innerHTML=enriched.map(p=>`
+    <article class="card">
+      <div class="card-top">
+        <div><h3>${p.name}</h3><div class="cat">${p.cat} · ${p.pr.length} stores</div></div>
+        <div class="bestprice"><small>FROM</small>$${p.best.toFixed(2)}</div>
+      </div>
+      <div class="pricelist">
+        ${p.pr.map((r,i)=>`<div class="pricerow ${i===0?'cheapest':''} ${r.community?'community':''}">
+          <span class="store">${r.community?r.store:storeLink(r.store,p.name)}</span><span class="price">$${r.price.toFixed(2)}</span></div>`).join('')}
+      </div>
+      <div class="savings">Save up to $${p.save.toFixed(2)} by shopping around</div>
+      <button class="addbtn" onclick="prefill(${p.id})">+ Add a price from your local bottle-o</button>
+    </article>`).join('');
+}
+
+/* SUBMIT PAGE */
+function showPage(page){
+  document.getElementById('pageBrowse').classList.toggle('hidden',page!=='browse');
+  document.getElementById('pageSubmit').classList.toggle('hidden',page!=='submit');
+  document.getElementById('navBrowse').classList.toggle('active',page==='browse');
+  document.getElementById('navSubmit').classList.toggle('active',page==='submit');
+  window.scrollTo(0,0);
+}
+function prefill(id){
+  showPage('submit');
+  document.getElementById('fProduct').value=id;
+}
+const sel=document.getElementById('fProduct');
+sel.innerHTML=products.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+
+function submitPrice(e){
+  e.preventDefault();
+  const entry={
+    id:parseInt(document.getElementById('fProduct').value),
+    store:document.getElementById('fStore').value.trim(),
+    suburb:document.getElementById('fSuburb').value.trim(),
+    price:parseFloat(document.getElementById('fPrice').value)
+  };
+  communityPrices.push(entry);
+  fetch('/api/community',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(entry)}).catch(()=>{});
+  e.target.reset();
+  const t=document.getElementById('toast');
+  t.style.display='block';
+  setTimeout(()=>{t.style.display='none';},2500);
+  showPage('browse');
+  render();
+  return false;
+}
+
+render();
+loadLive();
+</script>
+</body>
+</html>
