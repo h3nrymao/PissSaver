@@ -1,7 +1,9 @@
 // GET /api/prices — returns the latest price data.
 // Serves live-refreshed data from Vercel KV if available, else the base catalogue.
 import { kv } from '@vercel/kv';
-import base from '../data/products.json' assert { type: 'json' };
+import { readFileSync } from 'fs';
+import { join } from 'path';
+const base = JSON.parse(readFileSync(join(process.cwd(), 'data', 'products.json'), 'utf8'));
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate');

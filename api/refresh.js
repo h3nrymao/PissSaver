@@ -8,7 +8,9 @@
 // - Retailers change or protect their endpoints; each fetcher fails soft.
 //   Products keep their previous/base price if a lookup fails.
 import { kv } from '@vercel/kv';
-import base from '../data/products.json' assert { type: 'json' };
+import { readFileSync } from 'fs';
+import { join } from 'path';
+const base = JSON.parse(readFileSync(join(process.cwd(), 'data', 'products.json'), 'utf8'));
 
 const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
